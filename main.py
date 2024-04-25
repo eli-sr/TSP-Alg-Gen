@@ -59,6 +59,13 @@ def fitness_distancia_total(cromosoma):
         total += distancia_2_ciudades(cromosoma[i],cromosoma[i+1])
     return total
 
+# Funcion para obtener los nombres de las ciudades de los cromosomas
+def cromosoma_ciudades(cromosoma):
+    ciudades = []
+    for i in cromosoma:
+        ciudades.append(CIUDADES[i])
+    return ciudades
+
 ## MAIN
 
 # Generar N cromosomas aleatorios
