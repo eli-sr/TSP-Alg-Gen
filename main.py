@@ -7,6 +7,7 @@ CIUDADES = ["Alicante","Barcelona","Bilbao","Cáceres","Cádiz","Córdoba",
 "Coruña","Girona","Huelva","León","Madrid","Murcia","Oviedo",
 "Pamplona","Donostia","Sevilla","Tarragona","Toledo","Valencia",
 "Zaragoza"]
+CIUDADES_INDEX = np.arange(len(CIUDADES))
 
 # Matriz de distancias
 M = [
@@ -31,3 +32,16 @@ M = [
 [166,349,633,636,808,545,961,449,791,685,352,241,803,501,594,697,251,372,0,326],
 [498,296,324,622,988,725,833,396,957,488,325,539,604,175,268,863,231,396,326,0]
 ]
+
+N = 5
+
+def gen_cromosomas_aleatorios(N,array):
+    res = []
+    for _ in range(N):
+        cromosoma = np.copy(array)
+        np.random.shuffle(cromosoma)
+        res.append(cromosoma)
+    return res 
+
+# Generar N cromosomas aleatorios
+poblacion = gen_cromosomas_aleatorios(N,CIUDADES_INDEX)
