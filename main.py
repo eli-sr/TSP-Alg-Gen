@@ -2,6 +2,8 @@
 
 import numpy as np
 
+## CONSTANTES
+
 # Vector de ciudades
 CIUDADES = ["Alicante","Barcelona","Bilbao","Cáceres","Cádiz","Córdoba",
 "Coruña","Girona","Huelva","León","Madrid","Murcia","Oviedo",
@@ -35,6 +37,9 @@ M = [
 
 N = 5
 
+## FUNCIONES
+
+# Función para generar N cromosomas aleatorios
 def gen_cromosomas_aleatorios(N,array):
     res = []
     for _ in range(N):
@@ -43,5 +48,23 @@ def gen_cromosomas_aleatorios(N,array):
         res.append(cromosoma)
     return res 
 
+# Función para devolver la distancia entre dos ciudades
+def distancia_2_ciudades(A,B):
+    return M[A][B]
+
+# Función fitness para calcular la distancia total de un cromosoma
+def fitness_distancia_total(cromosoma):
+    total = 0
+    for i in range(len(cromosoma)-1):
+        total += distancia_2_ciudades(cromosoma[i],cromosoma[i+1])
+    return total
+
+## MAIN
+
 # Generar N cromosomas aleatorios
 poblacion = gen_cromosomas_aleatorios(N,CIUDADES_INDEX)
+
+# Obtener fitness de cada cromosoma
+for i in poblacion:
+    print(i,fitness_distancia_total(i))
+
