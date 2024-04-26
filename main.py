@@ -40,11 +40,13 @@ N = 5
 ## FUNCIONES
 
 # Función para generar N cromosomas aleatorios
-def gen_cromosomas_aleatorios(N,array):
+def gen_cromosomas_aleatorios(N,array,initialIndex):
     res = []
     for _ in range(N):
         cromosoma = np.copy(array)
+        cromosoma = np.delete(cromosoma, initialIndex)
         np.random.shuffle(cromosoma)
+        cromosoma = np.insert(cromosoma, 0, initialIndex)
         res.append(cromosoma)
     return res 
 
@@ -68,8 +70,12 @@ def cromosoma_ciudades(cromosoma):
 
 ## MAIN
 
+# Elegir ciudad inicial
+ciudad_inicial = "Pamplona"
+index_ci = CIUDADES.index(ciudad_inicial)
+
 # Generar N cromosomas aleatorios
-poblacion = gen_cromosomas_aleatorios(N,CIUDADES_INDEX)
+poblacion = gen_cromosomas_aleatorios(N,CIUDADES_INDEX,index_ci)
 
 # Obtener fitness de cada cromosoma y añadirlos a listas ordenadas
 poblacion_ord = []
