@@ -105,9 +105,8 @@ index_ci = CIUDADES.index(ciudad_inicial)
 # Generar N cromosomas aleatorios
 poblacion = gen_cromosomas_aleatorios(N,CIUDADES_INDEX,index_ci)
 
-# Asignar fitness
-for i in range(N):
-    cromosoma:Cromosoma = poblacion[i]
+# Calcular fitness
+for cromosoma in poblacion:
     cromosoma.calc_fitness()
 
 # Aplicamos el método del torneo
