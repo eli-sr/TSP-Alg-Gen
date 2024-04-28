@@ -36,8 +36,6 @@ M = [
 [498,296,324,622,988,725,833,396,957,488,325,539,604,175,268,863,231,396,326,0]
 ]
 
-N = 5
-
 class Cromosoma:
     def __init__(self,value):
         self.value = value
@@ -77,7 +75,28 @@ def gen_cromosomas_aleatorios(N,array,initialIndex): #
 def distancia_2_ciudades(A,B):
     return M[A][B]
 
+def get_lowest_fitness(k_cromosomas):
+    if len(k_cromosomas) == 1:
+        return k_cromosomas[0]
+
+    res:Cromosoma = k_cromosomas[0] 
+    for i in range(1,len(k_cromosomas)):
+        x:Cromosoma = k_cromosomas[i]
+        if x.fitness < res.fitness:
+            res = x
+    return res
+
+def torneo(poblacion, k, get_best_fitness):
+    progenitores = []
+    while len(progenitores) < len(poblacion):
+        contendientes = random.sample(poblacion, k) 
+        ganador = get_best_fitness(contendientes)
+        progenitores.append(ganador) 
+    return progenitores
+
 ## MAIN
+N = 10
+K = 3
 
 # Elegir ciudad inicial
 ciudad_inicial = "Pamplona"
@@ -90,3 +109,6 @@ poblacion = gen_cromosomas_aleatorios(N,CIUDADES_INDEX,index_ci)
 for i in range(N):
     cromosoma:Cromosoma = poblacion[i]
     cromosoma.calc_fitness()
+
+# Aplicamos el método del torneo
+progenitores = torneo(poblacion,K,get_lowest_fitness)
