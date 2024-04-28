@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
+import random
 
 ## CONSTANTES
 
@@ -37,43 +38,44 @@ M = [
 
 N = 5
 
+class Cromosoma:
+    def __init__(self,value):
+        self.value = value
+        self.fitness = None
+
+    # Función fitness para calcular la distancia total de un cromosoma
+    def calc_fitness(self):
+        total = 0
+        for i in range(len(self.value)-1):
+            total += distancia_2_ciudades(self.value[i],self.value[i+1])
+        self.fitness = total
+
+    # Funcion para obtener los nombres de las ciudades de los cromosomas
+    def get_ciudades(self):
+        ciudades = []
+        for i in self.value:
+            ciudades.append(CIUDADES[i])
+        return ciudades
+    
+    def to_string(self):
+        print(self.value,":",self.fitness)
+
 ## FUNCIONES
 
 # Función para generar N cromosomas aleatorios
-def gen_cromosomas_aleatorios(N,array,initialIndex):
+def gen_cromosomas_aleatorios(N,array,initialIndex): #
     res = []
     for _ in range(N):
         cromosoma = np.copy(array)
         cromosoma = np.delete(cromosoma, initialIndex)
         np.random.shuffle(cromosoma)
         cromosoma = np.insert(cromosoma, 0, initialIndex)
-        res.append(cromosoma)
+        res.append(Cromosoma(cromosoma))
     return res 
 
 # Función para devolver la distancia entre dos ciudades
 def distancia_2_ciudades(A,B):
     return M[A][B]
-
-# Función fitness para calcular la distancia total de un cromosoma
-def fitness_distancia_total(cromosoma):
-    total = 0
-    for i in range(len(cromosoma)-1):
-        total += distancia_2_ciudades(cromosoma[i],cromosoma[i+1])
-    return total
-
-# Funcion para obtener los nombres de las ciudades de los cromosomas
-def cromosoma_ciudades(cromosoma):
-    ciudades = []
-    for i in cromosoma:
-        ciudades.append(CIUDADES[i])
-    return ciudades
-
-def get_fitness(poblacion):
-    fitness = []
-    for i in range(N):
-        cromosoma = poblacion[i]
-        fitness_cromosoma = fitness_distancia_total(cromosoma)
-        fitness.append(fitness_cromosoma)
 
 ## MAIN
 
@@ -84,8 +86,7 @@ index_ci = CIUDADES.index(ciudad_inicial)
 # Generar N cromosomas aleatorios
 poblacion = gen_cromosomas_aleatorios(N,CIUDADES_INDEX,index_ci)
 
-# Asignar fitnes
-fitness_poblacion = get_fitness(poblacion)
-
-
-
+# Asignar fitness
+for i in range(N):
+    cromosoma:Cromosoma = poblacion[i]
+    cromosoma.calc_fitness()
