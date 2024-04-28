@@ -68,6 +68,13 @@ def cromosoma_ciudades(cromosoma):
         ciudades.append(CIUDADES[i])
     return ciudades
 
+def get_fitness(poblacion):
+    fitness = []
+    for i in range(N):
+        cromosoma = poblacion[i]
+        fitness_cromosoma = fitness_distancia_total(cromosoma)
+        fitness.append(fitness_cromosoma)
+
 ## MAIN
 
 # Elegir ciudad inicial
@@ -77,14 +84,8 @@ index_ci = CIUDADES.index(ciudad_inicial)
 # Generar N cromosomas aleatorios
 poblacion = gen_cromosomas_aleatorios(N,CIUDADES_INDEX,index_ci)
 
-# Obtener fitness de cada cromosoma y añadirlos a listas ordenadas
-poblacion_ord = []
-fitness_ord = []
-for i in range(N):
-    cromosoma = poblacion[i]
-    fitness_cromosoma = fitness_distancia_total(cromosoma)
-    pos = np.searchsorted(fitness_ord, fitness_cromosoma)
-    poblacion_ord.insert(pos,cromosoma)
-    fitness_ord.insert(pos,fitness_cromosoma)
+# Asignar fitnes
+fitness_poblacion = get_fitness(poblacion)
+
 
 
