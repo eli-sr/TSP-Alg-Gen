@@ -38,7 +38,7 @@ M = [
 ]
 
 class Cromosoma:
-    def __init__(self,value):
+    def __init__(self,value=np.array([])):
         self.value = value
         self.fitness = None
 
@@ -58,6 +58,9 @@ class Cromosoma:
     
     def to_string(self):
         print(self.value,":",self.fitness)
+    
+    def empty(self,length):
+        self.value = np.full(length, -1)
 
 ## FUNCIONES
 
@@ -95,8 +98,18 @@ def torneo(poblacion, k, get_best_fitness):
         progenitores.append(ganador) 
     return progenitores
 
+def search_index_to_insert(array1, array2, val_to_search, start, end):
+    for j in range(len(array2)):
+        if array2[j] == val_to_search:
+            if j not in range(start, end + 1):
+                return j
+            else:
+                val_to_search = array1[j]
+                return search_index_to_insert(array1, array2, val_to_search, start, end)
+
 def cruce_parcialmente_mapeado(padre1, padre2):
-    hijo = copy.copy(padre2)
+    hijo = Cromosoma()
+    hijo.empty(len(padre1.value))
 
     # 1- Escogemos dos puntos de cruzamiento al azar y cruzamos el segmento entre ellos de P1 en el primer hijo.
     punto_cruzamiento1 = random.randint(0, len(padre1.value) - 1)
@@ -106,6 +119,22 @@ def cruce_parcialmente_mapeado(padre1, padre2):
     # Rellenamos el hijo con los valores del padre 1
     for i in range(punto_cruzamiento1, punto_cruzamiento2 + 1):
         hijo.value[i] = padre1.value[i]
+
+    # 2- Buscar elementos en P2 que no hayan sido copiados
+    for i in range(punto_cruzamiento1, punto_cruzamiento2 + 1):
+        val_to_search = padre1.value[i]
+        val_to_insert = padre2.value[i]
+        if val_to_insert in hijo.value:
+            continue
+        index_to_insert = search_index_to_insert(padre1.value, padre2.value, val_to_search, punto_cruzamiento1, punto_cruzamiento2)
+        hijo.value[index_to_insert] = val_to_insert
+    
+    # 3- Copiamos los valores restantes del padre 2
+    for i in range(len(hijo.value)):
+        if hijo.value[i] == -1:
+            hijo.value[i] = padre2.value[i]
+
+    return hijo
 
 def cruzamiento(padre1, padre2):
     hijo1 = cruce_parcialmente_mapeado(padre1, padre2)
