@@ -2,6 +2,7 @@
 
 import numpy as np
 import random
+import copy
 
 ## CONSTANTES
 
@@ -94,6 +95,23 @@ def torneo(poblacion, k, get_best_fitness):
         progenitores.append(ganador) 
     return progenitores
 
+def cruce_parcialmente_mapeado(padre1, padre2):
+    hijo = copy.copy(padre2)
+
+    # 1- Escogemos dos puntos de cruzamiento al azar y cruzamos el segmento entre ellos de P1 en el primer hijo.
+    punto_cruzamiento1 = random.randint(0, len(padre1.value) - 1)
+    punto_cruzamiento2 = random.randint(0, len(padre1.value) - 1)
+    if punto_cruzamiento1 > punto_cruzamiento2:
+        punto_cruzamiento1, punto_cruzamiento2 = punto_cruzamiento2, punto_cruzamiento1
+    # Rellenamos el hijo con los valores del padre 1
+    for i in range(punto_cruzamiento1, punto_cruzamiento2 + 1):
+        hijo.value[i] = padre1.value[i]
+
+def cruzamiento(padre1, padre2):
+    hijo1 = cruce_parcialmente_mapeado(padre1, padre2)
+    hijo2 = cruce_parcialmente_mapeado(padre2, padre1)
+    return hijo1, hijo2
+ 
 ## MAIN
 N = 10
 K = 3
@@ -111,3 +129,12 @@ for cromosoma in poblacion:
 
 # Aplicamos el método del torneo
 progenitores = torneo(poblacion,K,get_lowest_fitness)
+
+# Cruzamos a los progenitores de dos en dos
+hijos = []
+for i in range(0,len(progenitores),2):
+    padre1 = progenitores[i]
+    padre2 = progenitores[i+1]
+    (hijo1,hijo2) = cruzamiento(padre1,padre2)
+    hijos.append(hijo1)
+    hijos.append(hijo2)
