@@ -139,6 +139,8 @@ def cruce_parcialmente_mapeado(padre1, padre2):
 def cruzamiento(padre1, padre2):
     hijo1 = cruce_parcialmente_mapeado(padre1, padre2)
     hijo2 = cruce_parcialmente_mapeado(padre2, padre1)
+    hijo1.calc_fitness()
+    hijo2.calc_fitness()
     return hijo1, hijo2
  
 ## MAIN
