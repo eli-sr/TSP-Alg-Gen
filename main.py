@@ -38,8 +38,9 @@ M = [
 ]
 
 class Cromosoma:
-    def __init__(self,value=np.array([])):
+    def __init__(self, initial_value, value=np.array([])):
         self.value = value
+        self.initial_value = initial_value
         self.fitness = None
 
     # Función fitness para calcular la distancia total de un cromosoma
@@ -47,6 +48,9 @@ class Cromosoma:
         total = 0
         for i in range(len(self.value)-1):
             total += distancia_2_ciudades(self.value[i],self.value[i+1])
+        # Sumo la distancia desde la ciudad de partida hasta la primera y última
+        total += distancia_2_ciudades(self.initial_value,self.value[0])
+        total += distancia_2_ciudades(self.value[-1], self.initial_value)
         self.fitness = total
 
     # Funcion para obtener los nombres de las ciudades de los cromosomas
@@ -71,8 +75,7 @@ def gen_cromosomas_aleatorios(N,array,initialIndex): #
         cromosoma = np.copy(array)
         cromosoma = np.delete(cromosoma, initialIndex)
         np.random.shuffle(cromosoma)
-        cromosoma = np.insert(cromosoma, 0, initialIndex)
-        res.append(Cromosoma(cromosoma))
+        res.append(Cromosoma(initialIndex, cromosoma))
     return res 
 
 # Función para devolver la distancia entre dos ciudades
@@ -108,7 +111,7 @@ def search_index_to_insert(array1, array2, val_to_search, start, end):
                 return search_index_to_insert(array1, array2, val_to_search, start, end)
 
 def cruce_parcialmente_mapeado(padre1, padre2):
-    hijo = Cromosoma()
+    hijo = Cromosoma(padre1.initial_value)
     hijo.empty(len(padre1.value))
 
     # 1- Escogemos dos puntos de cruzamiento al azar y cruzamos el segmento entre ellos de P1 en el primer hijo.
@@ -144,7 +147,7 @@ def cruzamiento(padre1, padre2):
     return hijo1, hijo2
  
 ## MAIN
-N = 10
+N = 30
 K = 3
 
 # Elegir ciudad inicial
