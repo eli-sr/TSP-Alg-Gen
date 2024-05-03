@@ -142,9 +142,17 @@ def cruce_parcialmente_mapeado(padre1, padre2):
 def cruzamiento(padre1, padre2):
     hijo1 = cruce_parcialmente_mapeado(padre1, padre2)
     hijo2 = cruce_parcialmente_mapeado(padre2, padre1)
-    hijo1.calc_fitness()
-    hijo2.calc_fitness()
     return hijo1, hijo2
+
+def mutacion_intercambio(cromosoma):
+    # Seleccionamos dos genes al azar
+    gen1 = random.randint(0,len(cromosoma.value)-1)
+    gen2 = random.randint(0,len(cromosoma.value)-1)
+    # Intercambiamos los genes
+    cromosoma.value[gen1], cromosoma.value[gen2] = cromosoma.value[gen2], cromosoma.value[gen1]
+
+def mutar(cromosoma):
+    return mutacion_intercambio(cromosoma)
  
 ## MAIN
 N = 30
@@ -170,5 +178,9 @@ for i in range(0,len(progenitores),2):
     padre1 = progenitores[i]
     padre2 = progenitores[i+1]
     (hijo1,hijo2) = cruzamiento(padre1,padre2)
+    mutar(hijo1)
+    mutar(hijo2)
+    hijo1.calc_fitness()
+    hijo2.calc_fitness()
     hijos.append(hijo1)
     hijos.append(hijo2)
