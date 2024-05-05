@@ -93,11 +93,11 @@ def get_lowest_fitness(k_cromosomas):
             res = x
     return res
 
-def torneo(poblacion, k, get_best_fitness):
+def torneo(poblacion):
     progenitores = []
     while len(progenitores) < len(poblacion):
-        contendientes = random.sample(poblacion, k) 
-        ganador = get_best_fitness(contendientes)
+        contendientes = random.sample(poblacion, K_TORNEO) 
+        ganador = get_lowest_fitness(contendientes)
         progenitores.append(ganador) 
     return progenitores
 
@@ -154,13 +154,13 @@ def mutacion_intercambio(cromosoma):
 def mutar(cromosoma):
     return mutacion_intercambio(cromosoma)
 
-def algoritmo_genetico(poblacion):
+def nueva_generacion(poblacion,metodo_selectivo,p_mutar):
     # Calcular fitness
     for cromosoma in poblacion:
         cromosoma.calc_fitness()
 
     # Aplicamos el método del torneo
-    progenitores = torneo(poblacion,K,get_lowest_fitness)
+    progenitores = metodo_selectivo(poblacion)
 
     # Cruzamos a los progenitores de dos en dos
     hijos = []
@@ -173,7 +173,7 @@ def algoritmo_genetico(poblacion):
 
     # Mutación de los hijos
     for hijo in hijos:
-        if random.random() < P_MUTAR:
+        if random.random() < p_mutar:
             mutar(hijo)
     
     return hijos
@@ -184,48 +184,39 @@ def get_avg_fitness(poblacion):
         total += cromosoma.fitness
     return total // len(poblacion)
 
-## MAIN
-N = 30
-K = 3
-P_MUTAR = 0.1
-N_GENERACIONES = 100
+def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_ci):
+    # Gráfico
+    x = []
+    y_best = []
+    y_avg = []
 
-# Gráfico
-x = []
-y_best = []
-y_avg = []
+    # Generar N cromosomas aleatorios
+    poblacion_inicial = gen_cromosomas_aleatorios(N,CIUDADES_INDEX,index_ci)
+
+    # Crear las siguientes generaciones
+    poblacion = poblacion_inicial
+    for i in range(N_GENERACIONES):
+        poblacion_prev = poblacion
+        poblacion = nueva_generacion(poblacion_prev, torneo, p_mutar)
+        x.append(i)
+        y_best.append(get_lowest_fitness(poblacion_prev).fitness)
+        y_avg.append(get_avg_fitness(poblacion_prev))
+
+    # Mostrar gráfico
+    plt.plot(x, y_best, label='Mejor fitness', color='green')
+    plt.plot(x, y_avg, label='Fitness promedio', color='blue')
+    plt.xlabel('Generación')
+    plt.ylabel('Fitness')
+    plt.show()
+
+## MAIN
+N_CROMOSOMAS = 30
+K_TORNEO = 3
+P_MUTAR = 0.1
+N_GENERACIONES = 500
 
 # Elegir ciudad inicial
 ciudad_inicial = "Pamplona"
 index_ci = CIUDADES.index(ciudad_inicial)
 
-# Generar N cromosomas aleatorios
-poblacion_inicial = gen_cromosomas_aleatorios(N,CIUDADES_INDEX,index_ci)
-
-poblacion = poblacion_inicial
-for i in range(N_GENERACIONES):
-    poblacion_prev = poblacion
-    poblacion = algoritmo_genetico(poblacion_prev)
-    x.append(i)
-    y_best.append(get_lowest_fitness(poblacion_prev).fitness)
-    y_avg.append(get_avg_fitness(poblacion_prev))
-poblacion_final = poblacion
-
-print("Población inicial")
-for i in poblacion_inicial:
-    print(i.value, i.fitness)
-
-print("Población final")
-for i in poblacion_final:
-    print(i.value, i.fitness)
-
-print("Población final nombres")
-for i in poblacion_final:
-    print(i.get_ciudades(), i.fitness)
-
-# Mostrar gráfico
-plt.plot(x, y_best, label='Mejor fitness', color='green')
-plt.plot(x, y_avg, label='Fitness promedio', color='blue')
-plt.xlabel('Generación')
-plt.ylabel('Fitness')
-plt.show()
+algoritmo_genetico(N_CROMOSOMAS, P_MUTAR, N_GENERACIONES, index_ci)
