@@ -157,6 +157,7 @@ def mutar(cromosoma):
 ## MAIN
 N = 30
 K = 3
+P_MUTAR = 0.1
 
 # Elegir ciudad inicial
 ciudad_inicial = "Pamplona"
@@ -178,9 +179,13 @@ for i in range(0,len(progenitores),2):
     padre1 = progenitores[i]
     padre2 = progenitores[i+1]
     (hijo1,hijo2) = cruzamiento(padre1,padre2)
-    mutar(hijo1)
-    mutar(hijo2)
     hijo1.calc_fitness()
     hijo2.calc_fitness()
     hijos.append(hijo1)
     hijos.append(hijo2)
+
+# Mutación de los hijos
+for hijo in hijos:
+    if random.random() < P_MUTAR:
+        mutar(hijo)
+    hijo.calc_fitness()
