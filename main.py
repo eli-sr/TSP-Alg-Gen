@@ -2,7 +2,7 @@
 
 import numpy as np
 import random
-import copy
+import matplotlib.pyplot as plt
 
 ## CONSTANTES
 
@@ -181,10 +181,22 @@ def algoritmo_genetico(poblacion):
     
     return hijos
 
+def get_avg_fitness(poblacion):
+    total = 0
+    for cromosoma in poblacion:
+        total += cromosoma.fitness
+    return total // len(poblacion)
+
 ## MAIN
 N = 30
 K = 3
 P_MUTAR = 0.1
+N_GENERACIONES = 1000
+
+# Gráfico
+x = []
+y_best = []
+y_avg = []
 
 # Elegir ciudad inicial
 ciudad_inicial = "Pamplona"
@@ -194,8 +206,11 @@ index_ci = CIUDADES.index(ciudad_inicial)
 poblacion_inicial = gen_cromosomas_aleatorios(N,CIUDADES_INDEX,index_ci)
 
 poblacion = poblacion_inicial
-for _ in range(80):
+for i in range(N_GENERACIONES):
     poblacion = algoritmo_genetico(poblacion)
+    x.append(i)
+    y_best.append(get_lowest_fitness(poblacion).fitness)
+    y_avg.append(get_avg_fitness(poblacion))
 
 poblacion_final = poblacion
 
@@ -210,3 +225,10 @@ for i in poblacion_final:
 print("Población final nombres")
 for i in poblacion_final:
     print(i.get_ciudades(), i.fitness)
+
+# Mostrar gráfico
+plt.plot(x, y_best, label='Mejor fitness', color='green')
+plt.plot(x, y_avg, label='Fitness promedio', color='blue')
+plt.xlabel('Generación')
+plt.ylabel('Fitness')
+plt.show()
