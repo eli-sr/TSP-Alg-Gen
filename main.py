@@ -168,8 +168,6 @@ def algoritmo_genetico(poblacion):
         padre1 = progenitores[i]
         padre2 = progenitores[i+1]
         (hijo1,hijo2) = cruzamiento(padre1,padre2)
-        hijo1.calc_fitness()
-        hijo2.calc_fitness()
         hijos.append(hijo1)
         hijos.append(hijo2)
 
@@ -177,7 +175,6 @@ def algoritmo_genetico(poblacion):
     for hijo in hijos:
         if random.random() < P_MUTAR:
             mutar(hijo)
-        hijo.calc_fitness()
     
     return hijos
 
@@ -191,7 +188,7 @@ def get_avg_fitness(poblacion):
 N = 30
 K = 3
 P_MUTAR = 0.1
-N_GENERACIONES = 1000
+N_GENERACIONES = 100
 
 # Gráfico
 x = []
@@ -207,11 +204,11 @@ poblacion_inicial = gen_cromosomas_aleatorios(N,CIUDADES_INDEX,index_ci)
 
 poblacion = poblacion_inicial
 for i in range(N_GENERACIONES):
-    poblacion = algoritmo_genetico(poblacion)
+    poblacion_prev = poblacion
+    poblacion = algoritmo_genetico(poblacion_prev)
     x.append(i)
-    y_best.append(get_lowest_fitness(poblacion).fitness)
-    y_avg.append(get_avg_fitness(poblacion))
-
+    y_best.append(get_lowest_fitness(poblacion_prev).fitness)
+    y_avg.append(get_avg_fitness(poblacion_prev))
 poblacion_final = poblacion
 
 print("Población inicial")
