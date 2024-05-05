@@ -153,7 +153,34 @@ def mutacion_intercambio(cromosoma):
 
 def mutar(cromosoma):
     return mutacion_intercambio(cromosoma)
- 
+
+def algoritmo_genetico(poblacion):
+    # Calcular fitness
+    for cromosoma in poblacion:
+        cromosoma.calc_fitness()
+
+    # Aplicamos el método del torneo
+    progenitores = torneo(poblacion,K,get_lowest_fitness)
+
+    # Cruzamos a los progenitores de dos en dos
+    hijos = []
+    for i in range(0,len(progenitores),2):
+        padre1 = progenitores[i]
+        padre2 = progenitores[i+1]
+        (hijo1,hijo2) = cruzamiento(padre1,padre2)
+        hijo1.calc_fitness()
+        hijo2.calc_fitness()
+        hijos.append(hijo1)
+        hijos.append(hijo2)
+
+    # Mutación de los hijos
+    for hijo in hijos:
+        if random.random() < P_MUTAR:
+            mutar(hijo)
+        hijo.calc_fitness()
+    
+    return hijos
+
 ## MAIN
 N = 30
 K = 3
@@ -164,28 +191,22 @@ ciudad_inicial = "Pamplona"
 index_ci = CIUDADES.index(ciudad_inicial)
 
 # Generar N cromosomas aleatorios
-poblacion = gen_cromosomas_aleatorios(N,CIUDADES_INDEX,index_ci)
+poblacion_inicial = gen_cromosomas_aleatorios(N,CIUDADES_INDEX,index_ci)
 
-# Calcular fitness
-for cromosoma in poblacion:
-    cromosoma.calc_fitness()
+poblacion = poblacion_inicial
+for _ in range(80):
+    poblacion = algoritmo_genetico(poblacion)
 
-# Aplicamos el método del torneo
-progenitores = torneo(poblacion,K,get_lowest_fitness)
+poblacion_final = poblacion
 
-# Cruzamos a los progenitores de dos en dos
-hijos = []
-for i in range(0,len(progenitores),2):
-    padre1 = progenitores[i]
-    padre2 = progenitores[i+1]
-    (hijo1,hijo2) = cruzamiento(padre1,padre2)
-    hijo1.calc_fitness()
-    hijo2.calc_fitness()
-    hijos.append(hijo1)
-    hijos.append(hijo2)
+print("Población inicial")
+for i in poblacion_inicial:
+    print(i.value, i.fitness)
 
-# Mutación de los hijos
-for hijo in hijos:
-    if random.random() < P_MUTAR:
-        mutar(hijo)
-    hijo.calc_fitness()
+print("Población final")
+for i in poblacion_final:
+    print(i.value, i.fitness)
+
+print("Población final nombres")
+for i in poblacion_final:
+    print(i.get_ciudades(), i.fitness)
