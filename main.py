@@ -188,6 +188,7 @@ def ruleta(poblacion):
     probabilidad = []
     inv_fitness = []
     inv_fitness_sum = 0
+    progenitores = []
 
     # Calcular la probabilidad de selección de cada cromosoma
     # Inveritmos fitness
@@ -198,8 +199,10 @@ def ruleta(poblacion):
     # Obtenemos las probabilidades 
     for i in inv_fitness:
         probabilidad.append(i/inv_fitness_sum)
-    # Elegimos cromosoma según su probabilidad 
-    cromosoma = np.random.choice(poblacion, p=probabilidad)
+    # Elegimos los cromosomas según su probabilidad hasta completar la población
+    while len(progenitores) < len(poblacion):
+        progenitores.append(np.random.choice(poblacion, p=probabilidad))
+    return progenitores
 
 def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_ci,metodo_selectivo=torneo):
     # Gráfico
