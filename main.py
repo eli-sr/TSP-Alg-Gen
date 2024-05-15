@@ -184,7 +184,22 @@ def get_avg_fitness(poblacion):
         total += cromosoma.fitness
     return total // len(poblacion)
 
-def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_ci):
+def ruleta(poblacion):
+    probabilidad = []
+    inv_fitness = []
+    inv_fitness_sum = 0
+
+    # Calcular la probabilidad de selección de cada cromosoma
+    # Inveritmos fitness
+    for cromosoma in poblacion:
+        inv_fitness_cromosoma = 1/cromosoma.fitness
+        inv_fitness.append(inv_fitness_cromosoma)
+        inv_fitness_sum += inv_fitness_cromosoma
+    # Obtenemos las probabilidades 
+    for i in inv_fitness:
+        probabilidad.append(i/inv_fitness_sum)
+
+def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_ci,metodo_selectivo=torneo):
     # Gráfico
     x = []
     y_best = []
@@ -197,7 +212,7 @@ def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_ci):
     poblacion = poblacion_inicial
     for i in range(N_GENERACIONES):
         poblacion_prev = poblacion
-        poblacion = nueva_generacion(poblacion_prev, torneo, p_mutar)
+        poblacion = nueva_generacion(poblacion_prev, metodo_selectivo, p_mutar)
         x.append(i)
         y_best.append(get_lowest_fitness(poblacion_prev).fitness)
         y_avg.append(get_avg_fitness(poblacion_prev))
@@ -219,4 +234,8 @@ N_GENERACIONES = 500
 ciudad_inicial = "Pamplona"
 index_ci = CIUDADES.index(ciudad_inicial)
 
-algoritmo_genetico(N_CROMOSOMAS, P_MUTAR, N_GENERACIONES, index_ci)
+# algoritmo_genetico(N_CROMOSOMAS, P_MUTAR, N_GENERACIONES, index_ci, ruleta)
+poblacion = gen_cromosomas_aleatorios(N_CROMOSOMAS,CIUDADES_INDEX,index_ci)
+for cromosoma in poblacion:
+    cromosoma.calc_fitness()
+progenitores = ruleta(poblacion)
