@@ -142,7 +142,23 @@ def cruce_parcialmente_mapeado(padre1, padre2):
 def cruzamiento(padre1, padre2):
     hijo1 = cruce_parcialmente_mapeado(padre1, padre2)
     hijo2 = cruce_parcialmente_mapeado(padre2, padre1)
-    return hijo1, hijo2
+    return [hijo1, hijo2]
+
+def cruzamiento_aristas(padre1, padre2):
+    # Construimos tabla de adyacencia
+    adyacencia = {}
+    for i in padre1.value:
+        index = padre1.value.index(i)
+        adyacencia[i] = []
+        adyacencia[i].append(padre1.value[(index+1)%(len(padre1.value))])
+        adyacencia[i].append(padre1.value[index-1])
+        index = padre2.value.index(i)
+        adyacencia[i].append(padre2.value[(index+1)%(len(padre2.value))])
+        adyacencia[i].append(padre2.value[index-1])
+    # Elegimos un elemento al azar
+    r = np.random.choice(padre1.value)
+
+    return adyacencia
 
 def intercambio(cromosoma):
     # Seleccionamos dos genes al azar
@@ -168,9 +184,7 @@ def nueva_generacion(poblacion,p_mutar,metodo_progenitores,metodo_supervivientes
     for i in range(0,len(progenitores),2):
         padre1 = progenitores[i]
         padre2 = progenitores[i+1]
-        (hijo1,hijo2) = cruzamiento(padre1,padre2)
-        hijos.append(hijo1)
-        hijos.append(hijo2)
+        hijos += cruzamiento(padre1,padre2)
 
     # Mutación de los hijos
     for hijo in hijos:
@@ -240,14 +254,18 @@ def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_ci,metodo_progenitores=
     plt.ylabel('Fitness')
     plt.show()
 
+    return poblacion
+
 ## MAIN
-N_CROMOSOMAS = 30
-K_TORNEO = 3
-P_MUTAR = 0.1
+N_CROMOSOMAS = 64
+K_TORNEO = 8
+P_MUTAR = 0.3
 N_GENERACIONES = 500
 
 # Elegir ciudad inicial
 ciudad_inicial = "Pamplona"
 index_ci = CIUDADES.index(ciudad_inicial)
 
-algoritmo_genetico(N_CROMOSOMAS, P_MUTAR, N_GENERACIONES, index_ci, metodo_progenitores=ruleta, metodo_supervivientes=adaptados, metodo_mutacion=intercambio) 
+if __name__ == "__main__":
+    p = algoritmo_genetico(N_CROMOSOMAS, P_MUTAR, N_GENERACIONES, index_ci, metodo_progenitores=ruleta, metodo_supervivientes=adaptados, metodo_mutacion=intercambio) 
+    print(get_lowest_fitness(p).fitness)
