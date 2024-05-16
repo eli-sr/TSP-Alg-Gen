@@ -162,9 +162,9 @@ def supervivientes_adaptados(progenitores,hijos):
     todos_ordenados = sorted(todos, key=lambda x: x.fitness)
     return todos_ordenados[:len(progenitores)]
 
-def nueva_generacion(poblacion,metodo_selectivo,p_mutar,seleccionar_supervivientes):
+def nueva_generacion(poblacion,p_mutar,metodo_progenitores,metodo_supervivientes):
     # Aplicamos el método del torneo
-    progenitores = metodo_selectivo(poblacion)
+    progenitores = metodo_progenitores(poblacion)
 
     # Cruzamos a los progenitores de dos en dos
     hijos = []
@@ -185,7 +185,7 @@ def nueva_generacion(poblacion,metodo_selectivo,p_mutar,seleccionar_supervivient
         cromosoma.calc_fitness()
 
     # Selección de supervivientes
-    supervivientes = seleccionar_supervivientes(progenitores,hijos)
+    supervivientes = metodo_supervivientes(progenitores,hijos)
 
     return supervivientes
 
@@ -215,7 +215,7 @@ def ruleta(poblacion):
         progenitores.append(np.random.choice(poblacion, p=probabilidad))
     return progenitores
 
-def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_ci,metodo_selectivo=torneo,seleccionar_supervivientes=supervivientes_jovenes):
+def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_ci,metodo_progenitores=torneo,metodo_supervivientes=supervivientes_jovenes):
     # Gráfico
     x = []
     y_best = []
@@ -235,8 +235,7 @@ def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_ci,metodo_selectivo=tor
         x.append(i)
         y_best.append(get_lowest_fitness(poblacion).fitness)
         y_avg.append(get_avg_fitness(poblacion))
-        poblacion_next = nueva_generacion(poblacion, metodo_selectivo, p_mutar, seleccionar_supervivientes)
-
+        poblacion_next = nueva_generacion(poblacion, p_mutar, metodo_progenitores, metodo_supervivientes)
 
     # Mostrar gráfico
     plt.plot(x, y_best, label='Mejor fitness', color='green')
