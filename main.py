@@ -145,8 +145,10 @@ def cruzamiento(padre1, padre2):
     return [hijo1, hijo2]
 
 def cruzamiento_aristas(padre1, padre2):
-    # Construimos tabla de adyacencia
     adyacencia = {}
+    hijoValue = []
+
+    # Construimos tabla de adyacencia
     for i in padre1.value:
         index = padre1.value.index(i)
         adyacencia[i] = []
@@ -155,10 +157,42 @@ def cruzamiento_aristas(padre1, padre2):
         index = padre2.value.index(i)
         adyacencia[i].append(padre2.value[(index+1)%(len(padre2.value))])
         adyacencia[i].append(padre2.value[index-1])
+
     # Elegimos un elemento al azar
     r = np.random.choice(padre1.value)
+    hijoValue.append(r)
+    for i in range(len(padre1.value)-1):
+        print(hijoValue)
+        val = hijoValue[i]
 
-    return adyacencia
+        # Eliminamos el elemento de la tabla de adyacencia
+        for key in adyacencia:
+            while val in adyacencia[key]:
+                adyacencia[key].remove(val)
+
+        # Vemos si hay una arista en común
+        lista = adyacencia[val]
+        nueva_arista = None
+        for j in lista:
+            if lista.count(j) > 1:
+                nueva_arista = j
+                break
+        if nueva_arista is not None:
+            hijoValue.append(nueva_arista)
+            continue
+
+        # Escogemos la entrada con la lista mas corta
+        len_listas = [len(adyacencia[j]) for j in lista]
+        entrada_menor = min(len_listas)
+        indices_entrada_menor = [i for i in range(len(len_listas)) if len_listas[i] == entrada_menor]
+        # Deshacemos el empate
+        if len(indices_entrada_menor) > 1:
+            n = np.random.choice(indices_entrada_menor)
+            hijoValue.append(lista[n])
+        else:
+            hijoValue.append(lista[indices_entrada_menor[0]])
+
+    return hijoValue
 
 def intercambio(cromosoma):
     # Seleccionamos dos genes al azar
