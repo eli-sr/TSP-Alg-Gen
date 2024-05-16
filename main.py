@@ -151,10 +151,10 @@ def intercambio(cromosoma):
     # Intercambiamos los genes
     cromosoma.value[gen1], cromosoma.value[gen2] = cromosoma.value[gen2], cromosoma.value[gen1]
 
-def supervivientes_jovenes(progenitores,hijos):
+def jovenes(progenitores,hijos):
     return hijos
 
-def supervivientes_adaptados(progenitores,hijos):
+def adaptados(progenitores,hijos):
     todos = progenitores + hijos
     todos_ordenados = sorted(todos, key=lambda x: x.fitness)
     return todos_ordenados[:len(progenitores)]
@@ -212,7 +212,7 @@ def ruleta(poblacion):
         progenitores.append(np.random.choice(poblacion, p=probabilidad))
     return progenitores
 
-def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_ci,metodo_progenitores=torneo,metodo_supervivientes=supervivientes_jovenes, metodo_mutacion=intercambio):
+def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_ci,metodo_progenitores=torneo,metodo_supervivientes=jovenes, metodo_mutacion=intercambio):
     # Gráfico
     x = []
     y_best = []
@@ -251,4 +251,4 @@ N_GENERACIONES = 500
 ciudad_inicial = "Pamplona"
 index_ci = CIUDADES.index(ciudad_inicial)
 
-algoritmo_genetico(N_CROMOSOMAS, P_MUTAR, N_GENERACIONES, index_ci, ruleta, supervivientes_adaptados, intercambio)
+algoritmo_genetico(N_CROMOSOMAS, P_MUTAR, N_GENERACIONES, index_ci, metodo_progenitores=ruleta, metodo_supervivientes=adaptados, metodo_mutacion=intercambio) 
