@@ -177,9 +177,7 @@ def nueva_generacion(poblacion,p_mutar,metodo_progenitores,metodo_supervivientes
         if random.random() < p_mutar:
             metodo_mutacion(hijo)
 
-    # Calcular fitness hijos
-    for cromosoma in hijos:
-        cromosoma.calc_fitness()
+    calc_fitness_poblacion(hijos)
 
     # Selección de supervivientes
     supervivientes = metodo_supervivientes(progenitores,hijos)
@@ -212,6 +210,10 @@ def ruleta(poblacion):
         progenitores.append(np.random.choice(poblacion, p=probabilidad))
     return progenitores
 
+def calc_fitness_poblacion(poblacion):
+    for cromosoma in poblacion:
+        cromosoma.calc_fitness()
+
 def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_ci,metodo_progenitores=torneo,metodo_supervivientes=jovenes, metodo_mutacion=intercambio):
     # Gráfico
     x = []
@@ -220,10 +222,7 @@ def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_ci,metodo_progenitores=
 
     # Generar N cromosomas aleatorios
     poblacion_inicial = gen_cromosomas_aleatorios(N,CIUDADES_INDEX,index_ci)
-
-    # Calcular fitness
-    for cromosoma in poblacion_inicial:
-        cromosoma.calc_fitness()
+    calc_fitness_poblacion(poblacion_inicial)
 
     # Crear las siguientes generaciones
     poblacion_next = poblacion_inicial
