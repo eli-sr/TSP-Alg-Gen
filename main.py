@@ -110,7 +110,7 @@ def search_index_to_insert(array1, array2, val_to_search, start, end):
                 val_to_search = array1[j]
                 return search_index_to_insert(array1, array2, val_to_search, start, end)
 
-def cruce_parcialmente_mapeado(padre1, padre2):
+def pmx_parcial(padre1, padre2):
     hijo = Cromosoma(padre1.initial_value)
     hijo.empty(len(padre1.value))
 
@@ -139,22 +139,22 @@ def cruce_parcialmente_mapeado(padre1, padre2):
 
     return hijo
 
-def cruzamiento(padre1, padre2):
-    hijo1 = cruce_parcialmente_mapeado(padre1, padre2)
-    hijo2 = cruce_parcialmente_mapeado(padre2, padre1)
+def pmx(padre1, padre2):
+    hijo1 = pmx_parcial(padre1, padre2)
+    hijo2 = pmx_parcial(padre2, padre1)
     return [hijo1, hijo2]
 
-def cruzamiento_aristas(padre1, padre2):
+def aristas(padre1, padre2):
     adyacencia = {}
     hijoValue = []
 
     # Construimos tabla de adyacencia
     for i in padre1.value:
-        index = padre1.value.index(i)
+        index = np.where(padre1.value == i)[0][0]
         adyacencia[i] = []
         adyacencia[i].append(padre1.value[(index+1)%(len(padre1.value))])
         adyacencia[i].append(padre1.value[index-1])
-        index = padre2.value.index(i)
+        index = np.where(padre2.value == i)[0][0]
         adyacencia[i].append(padre2.value[(index+1)%(len(padre2.value))])
         adyacencia[i].append(padre2.value[index-1])
 
@@ -162,7 +162,6 @@ def cruzamiento_aristas(padre1, padre2):
     r = np.random.choice(padre1.value)
     hijoValue.append(r)
     for i in range(len(padre1.value)-1):
-        print(hijoValue)
         val = hijoValue[i]
 
         # Eliminamos el elemento de la tabla de adyacencia
@@ -170,8 +169,18 @@ def cruzamiento_aristas(padre1, padre2):
             while val in adyacencia[key]:
                 adyacencia[key].remove(val)
 
-        # Vemos si hay una arista en común
         lista = adyacencia[val]
+
+        # Comprobamos si la lista está vacía
+        if(len(lista) == 0):
+            # Obtenemos los elementos que no estan en hijoValue
+            elementos = [i for i in padre1.value if i not in hijoValue]
+            # y elegimos uno al azar
+            r = np.random.choice(elementos)
+            hijoValue.append(r)
+            continue
+
+        # Vemos si hay una arista en común
         nueva_arista = None
         for j in lista:
             if lista.count(j) > 1:
@@ -192,7 +201,7 @@ def cruzamiento_aristas(padre1, padre2):
         else:
             hijoValue.append(lista[indices_entrada_menor[0]])
 
-    return hijoValue
+    return [Cromosoma(padre1.initial_value,hijoValue)]
 
 def intercambio(cromosoma):
     # Seleccionamos dos genes al azar
@@ -209,7 +218,7 @@ def adaptados(progenitores,hijos):
     todos_ordenados = sorted(todos, key=lambda x: x.fitness)
     return todos_ordenados[:len(progenitores)]
 
-def nueva_generacion(poblacion,p_mutar,metodo_progenitores,metodo_supervivientes,metodo_mutacion):
+def nueva_generacion(poblacion,p_mutar,metodo_progenitores,metodo_supervivientes,metodo_mutacion,metodo_cruce):
     # Aplicamos el método del torneo
     progenitores = metodo_progenitores(poblacion)
 
@@ -218,7 +227,7 @@ def nueva_generacion(poblacion,p_mutar,metodo_progenitores,metodo_supervivientes
     for i in range(0,len(progenitores),2):
         padre1 = progenitores[i]
         padre2 = progenitores[i+1]
-        hijos += cruzamiento(padre1,padre2)
+        hijos += metodo_cruce(padre1,padre2)
 
     # Mutación de los hijos
     for hijo in hijos:
@@ -262,7 +271,7 @@ def calc_fitness_poblacion(poblacion):
     for cromosoma in poblacion:
         cromosoma.calc_fitness()
 
-def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_ci,metodo_progenitores=torneo,metodo_supervivientes=jovenes, metodo_mutacion=intercambio):
+def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_ci,metodo_progenitores=torneo,metodo_supervivientes=jovenes, metodo_mutacion=intercambio, metodo_cruce=aristas):
     # Gráfico
     x = []
     y_best = []
@@ -279,7 +288,7 @@ def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_ci,metodo_progenitores=
         x.append(i)
         y_best.append(get_lowest_fitness(poblacion).fitness)
         y_avg.append(get_avg_fitness(poblacion))
-        poblacion_next = nueva_generacion(poblacion, p_mutar, metodo_progenitores, metodo_supervivientes, metodo_mutacion)
+        poblacion_next = nueva_generacion(poblacion, p_mutar, metodo_progenitores, metodo_supervivientes, metodo_mutacion, metodo_cruce)
 
     # Mostrar gráfico
     plt.plot(x, y_best, label='Mejor fitness', color='green')
@@ -291,7 +300,7 @@ def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_ci,metodo_progenitores=
     return poblacion
 
 ## MAIN
-N_CROMOSOMAS = 64
+N_CROMOSOMAS = 100
 K_TORNEO = 8
 P_MUTAR = 0.3
 N_GENERACIONES = 500
@@ -301,5 +310,5 @@ ciudad_inicial = "Pamplona"
 index_ci = CIUDADES.index(ciudad_inicial)
 
 if __name__ == "__main__":
-    p = algoritmo_genetico(N_CROMOSOMAS, P_MUTAR, N_GENERACIONES, index_ci, metodo_progenitores=ruleta, metodo_supervivientes=adaptados, metodo_mutacion=intercambio) 
+    p = algoritmo_genetico(N_CROMOSOMAS, P_MUTAR, N_GENERACIONES, index_ci, metodo_progenitores=ruleta, metodo_supervivientes=adaptados, metodo_mutacion=intercambio, metodo_cruce=aristas) 
     print(get_lowest_fitness(p).fitness)
