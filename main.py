@@ -211,7 +211,8 @@ def intercambio(cromosoma):
     cromosoma.value[gen1], cromosoma.value[gen2] = cromosoma.value[gen2], cromosoma.value[gen1]
 
 def jovenes(progenitores,hijos):
-    return hijos
+    todos = hijos + progenitores
+    return todos[:len(progenitores)]
 
 def adaptados(progenitores,hijos):
     todos = progenitores + hijos
@@ -271,14 +272,14 @@ def calc_fitness_poblacion(poblacion):
     for cromosoma in poblacion:
         cromosoma.calc_fitness()
 
-def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_ci,metodo_progenitores=torneo,metodo_supervivientes=jovenes, metodo_mutacion=intercambio, metodo_cruce=aristas):
+def algoritmo_genetico(N, p_mutar, N_GENERACIONES, index_inicial, metodo_progenitores=torneo,metodo_supervivientes=adaptados, metodo_mutacion=intercambio, metodo_cruce=aristas):
     # Gráfico
     x = []
     y_best = []
     y_avg = []
 
     # Generar N cromosomas aleatorios
-    poblacion_inicial = gen_cromosomas_aleatorios(N,CIUDADES_INDEX,index_ci)
+    poblacion_inicial = gen_cromosomas_aleatorios(N,CIUDADES_INDEX,index_inicial)
     calc_fitness_poblacion(poblacion_inicial)
 
     # Crear las siguientes generaciones
@@ -307,8 +308,9 @@ N_GENERACIONES = 500
 
 # Elegir ciudad inicial
 ciudad_inicial = "Pamplona"
-index_ci = CIUDADES.index(ciudad_inicial)
+index_inicial = CIUDADES.index(ciudad_inicial)
 
 if __name__ == "__main__":
-    p = algoritmo_genetico(N_CROMOSOMAS, P_MUTAR, N_GENERACIONES, index_ci, metodo_progenitores=ruleta, metodo_supervivientes=adaptados, metodo_mutacion=intercambio, metodo_cruce=aristas) 
+    p = algoritmo_genetico(N_CROMOSOMAS, P_MUTAR, N_GENERACIONES, index_inicial) 
     print(get_lowest_fitness(p).fitness)
+    print(get_lowest_fitness(p).get_ciudades())
